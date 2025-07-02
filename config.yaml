@@ -1,0 +1,27 @@
+crawling:
+  urls_to_crawl:
+    - 'https://www.acquisition.gov/browse/index/far'
+  crawl_depth: 1
+  max_pages: 10
+  respect_robots: true
+
+ingestion:
+  folders:
+    - './data/docs'
+    - './data/pdfs'
+    - './data/mds'
+  chunk_size: 1024
+  chunk_overlap: 200
+
+embedding:
+  model: 'all-MiniLM-L6-v2'
+  batch_size: 100
+
+retrieval:
+  top_k: 5
+  similarity_threshold: 0.7
+
+llm:
+  model: 'llama3-8b-8192'
+  temperature: 0.2
+  max_tokens: 800
