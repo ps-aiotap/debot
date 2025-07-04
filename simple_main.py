@@ -7,6 +7,7 @@ from dotenv import load_dotenv
 from ingest.load_docs import load_documents
 from ingest.load_pdfs import load_pdfs
 from ingest.crawler import crawl_websites
+from ingest.load_excel import load_excel_testcases
 from ingest.load_sharepoint import load_sharepoint_documents
 from ingest.load_azure_wiki import load_azure_devops_wiki
 from simple_embedding import SimpleEmbeddingService
@@ -41,6 +42,13 @@ class SimpleChatbotApp:
             mds_docs = load_documents(os.getenv('MDS_DIR'))
             all_documents.extend(mds_docs)
             print(f"Loaded {len(mds_docs)} documents from MDS_DIR")
+        
+        # Load Excel/CSV test cases
+        if os.getenv('EXCEL_DIR'):
+            print("Loading Excel/CSV test cases...")
+            excel_docs = load_excel_testcases(os.getenv('EXCEL_DIR'))
+            all_documents.extend(excel_docs)
+            print(f"Loaded {len(excel_docs)} test case documents")
         
         # Load PDFs
         print("Loading PDFs...")
