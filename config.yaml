@@ -1,8 +1,7 @@
 crawling:
-  urls_to_crawl:
-    - 'https://www.acquisition.gov/browse/index/far'
-  crawl_depth: 1
-  max_pages: 10
+  urls_to_crawl: []
+  crawl_depth: 0
+  max_pages: 0
   respect_robots: true
 
 ingestion:
