@@ -30,6 +30,24 @@ services:
     volumes:
       - postgres_data:/var/lib/postgresql/data
 
+  chatbot:
+    build: .
+    ports:
+      - "8501:8501"  # Streamlit
+      - "8000:8000"  # API (future)
+    environment:
+      - REDIS_HOST=redis
+      - CHROMA_HOST=chromadb
+      - POSTGRES_HOST=postgres
+    volumes:
+      - ./data:/app/data
+      - ./.env:/app/.env
+    depends_on:
+      - redis
+      - chromadb
+      - postgres
+    command: streamlit run streamlit_app.py --server.address 0.0.0.0
+
 volumes:
   redis_data:
   chroma_data:

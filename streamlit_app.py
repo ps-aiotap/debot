@@ -1,127 +1,94 @@
 import streamlit as st
 import asyncio
-from main import ChatbotApp
+import os
+from dotenv import load_dotenv
+from simple_main import ChatbotApp
 
-# Page config
-st.set_page_config(
-    page_title="AI Domain Expert Chatbot",
-    page_icon="🤖",
-    layout="wide"
-)
+load_dotenv()
+
+# Initialize session state
+if 'chatbot' not in st.session_state:
+    st.session_state.chatbot = None
+    st.session_state.initialized = False
 
 @st.cache_resource
 def initialize_chatbot():
-    """Initialize chatbot with caching."""
+    """Initialize chatbot once and cache it."""
     app = ChatbotApp()
     loop = asyncio.new_event_loop()
     asyncio.set_event_loop(loop)
-    success = loop.run_until_complete(app.initialize())
-    return app if success else None
+    loop.run_until_complete(app.initialize())
+    return app
 
-def main():
-    st.title("🤖 AI Domain Expert Chatbot")
-    st.markdown("Ask questions about your domain-specific documentation and selected websites.")
-    
-    # Initialize chatbot
-    if 'chatbot' not in st.session_state:
-        with st.spinner("Initializing chatbot..."):
+# Streamlit UI
+st.title("🤖 DHHS AI Domain Expert Chatbot")
+st.markdown("Ask questions about your documents, test cases, and business requirements.")
+
+# Initialize chatbot
+if not st.session_state.initialized:
+    with st.spinner("Initializing chatbot..."):
+        try:
             st.session_state.chatbot = initialize_chatbot()
-    
-    if not st.session_state.chatbot:
-        st.error("Failed to initialize chatbot. Please check your configuration and data sources.")
-        return
-    
-    # Sidebar controls
-    with st.sidebar:
-        st.header("Settings")
-        
-        source_filter = st.selectbox(
-            "Source Filter",
-            ["all", "docs", "web"],
-            help="Filter responses by source type"
-        )
-        
-        use_cache = st.checkbox(
-            "Use cached responses",
-            value=True,
-            help="Use cached responses for faster replies"
-        )
-        
-        if st.button("Clear Chat History"):
-            st.session_state.messages = []
-            st.rerun()
-        
-        st.markdown("---")
-        st.markdown("**Source Types:**")
-        st.markdown("- **docs**: Local documents and PDFs")
-        st.markdown("- **web**: Crawled websites")
-        st.markdown("- **all**: All sources")
-    
+            st.session_state.initialized = True
+            st.success("Chatbot initialized successfully!")
+        except Exception as e:
+            st.error(f"Failed to initialize chatbot: {e}")
+            st.stop()
+
+# Chat interface
+if st.session_state.initialized:
     # Initialize chat history
     if "messages" not in st.session_state:
         st.session_state.messages = []
-    
-    # Display chat history
+
+    # Display chat messages
     for message in st.session_state.messages:
         with st.chat_message(message["role"]):
             st.markdown(message["content"])
-            
-            # Show sources if available
-            if message["role"] == "assistant" and "sources" in message:
-                if message["sources"]:
-                    with st.expander(f"Sources ({len(message['sources'])})", expanded=False):
-                        for i, source in enumerate(message["sources"], 1):
-                            st.markdown(f"**{i}. {source['filename']}** ({source['type']})")
-                            st.markdown(f"*Source: {source['source']}*")
-                            st.markdown(f"Preview: {source['content_preview']}")
-                            st.markdown("---")
-    
+
     # Chat input
-    if prompt := st.chat_input("Ask your question here..."):
+    if prompt := st.chat_input("Ask a question about your documents..."):
         # Add user message to chat history
         st.session_state.messages.append({"role": "user", "content": prompt})
-        
-        # Display user message
         with st.chat_message("user"):
             st.markdown(prompt)
-        
-        # Generate response
+
+        # Get bot response
         with st.chat_message("assistant"):
             with st.spinner("Thinking..."):
-                response = st.session_state.chatbot.ask_question(
-                    prompt, 
-                    use_cache=use_cache, 
-                    source_filter=source_filter
-                )
-            
-            if "error" in response:
-                st.error(response["error"])
-                return
-            
-            # Display answer
-            answer = response["answer"]
-            st.markdown(answer)
-            
-            # Show cache indicator
-            if response.get("cached", False):
-                st.info("ℹ️ This response was retrieved from cache")
-            
-            # Show sources
-            sources = response.get("sources", [])
-            if sources:
-                with st.expander(f"Sources ({len(sources)})", expanded=False):
-                    for i, source in enumerate(sources, 1):
-                        st.markdown(f"**{i}. {source['filename']}** ({source['type']})")
-                        st.markdown(f"*Source: {source['source']}*")
-                        st.markdown(f"Preview: {source['content_preview']}")
-                        st.markdown("---")
-            
-            # Add assistant response to chat history
-            st.session_state.messages.append({
-                "role": "assistant", 
-                "content": answer,
-                "sources": sources
-            })
+                try:
+                    response = st.session_state.chatbot.ask_question(prompt)
+                    answer = response.get('answer', 'No answer generated.')
+                    sources = response.get('sources', [])
+                    
+                    st.markdown(answer)
+                    
+                    # Show sources if available
+                    if sources:
+                        st.markdown("**Sources:**")
+                        for i, source in enumerate(sources, 1):
+                            filename = source.get('filename', 'Unknown')
+                            st.markdown(f"{i}. {filename}")
+                    
+                    # Add assistant response to chat history
+                    st.session_state.messages.append({"role": "assistant", "content": answer})
+                    
+                except Exception as e:
+                    error_msg = f"Error: {str(e)}"
+                    st.error(error_msg)
+                    st.session_state.messages.append({"role": "assistant", "content": error_msg})
 
-if __name__ == "__main__":
-    main()
+# Sidebar with info
+with st.sidebar:
+    st.header("ℹ️ Information")
+    st.markdown("""
+    This chatbot can answer questions about:
+    - 📄 Your documents (.md, .txt, .docx)
+    - 📊 Test cases and business requirements
+    - 📋 PDF documents
+    - 🌐 Crawled web content
+    """)
+    
+    if st.button("Clear Chat History"):
+        st.session_state.messages = []
+        st.rerun()
