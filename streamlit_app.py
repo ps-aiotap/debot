@@ -2,7 +2,7 @@ import streamlit as st
 import asyncio
 import os
 from dotenv import load_dotenv
-from simple_main import ChatbotApp
+from simple_main import SimpleChatbotApp
 
 load_dotenv()
 
@@ -11,13 +11,16 @@ if 'chatbot' not in st.session_state:
     st.session_state.chatbot = None
     st.session_state.initialized = False
 
-@st.cache_resource
 def initialize_chatbot():
     """Initialize chatbot once and cache it."""
-    app = ChatbotApp()
+    print("DEBUG: Starting chatbot initialization")
+    app = SimpleChatbotApp()
+    print("DEBUG: SimpleChatbotApp created")
     loop = asyncio.new_event_loop()
     asyncio.set_event_loop(loop)
+    print("DEBUG: About to run app.initialize()")
     loop.run_until_complete(app.initialize())
+    print("DEBUG: app.initialize() completed")
     return app
 
 # Streamlit UI
