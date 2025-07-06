@@ -16,7 +16,7 @@ services:
     ports:
       - "${CHROMA_PORT}:8000"
     volumes:
-      - ./chromadb_data:/chroma/chroma
+      - chromadb_data:/chroma/chroma
     environment:
       - CHROMA_SERVER_HOST=0.0.0.0
       - CHROMA_SERVER_HTTP_PORT=8000
@@ -26,3 +26,4 @@ services:
 
 volumes:
   redis_data:
+  chromadb_data:
