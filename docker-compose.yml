@@ -24,6 +24,21 @@ services:
       - PERSIST_DIRECTORY=/chroma/chroma
     # Using default command
 
+  # Document management service
+  docs:
+    image: alpine:latest
+    volumes:
+      - documents_data:/docs
+      - ./data:/host_data
+    command: |
+      sh -c '
+      echo "Syncing documents to volume..."
+      cp -r /host_data/* /docs/ 2>/dev/null || true
+      echo "Documents synced. Volume ready."
+      tail -f /dev/null
+      '
+
 volumes:
   redis_data:
   chromadb_data:
+  documents_data:
