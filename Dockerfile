@@ -18,8 +18,8 @@ RUN pip install --no-cache-dir -r requirements.txt
 # Copy application code
 COPY . .
 
-# Copy data into image (so it's available in K8s)
-COPY data/ /app/data/
+# Create data directory
+RUN mkdir -p /app/data
 
 # Expose port for Streamlit
 EXPOSE 8501

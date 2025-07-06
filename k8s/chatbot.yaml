@@ -25,6 +25,12 @@ spec:
             name: debot-config
         - secretRef:
             name: debot-secrets
+        volumeMounts:
+        - name: data-volume
+          mountPath: /app/data
+      volumes:
+      - name: data-volume
+        emptyDir: {}
 
 ---
 apiVersion: v1
