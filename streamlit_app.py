@@ -24,7 +24,7 @@ def initialize_chatbot():
     return app
 
 # Streamlit UI
-st.title("🤖 DHHS AI Domain Expert Chatbot")
+st.title("🤖 AI Domain Expert Chatbot")
 st.markdown("Ask questions about your documents, test cases, and business requirements.")
 
 # Initialize chatbot
