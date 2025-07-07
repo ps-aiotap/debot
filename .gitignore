@@ -154,7 +154,7 @@ Thumbs.db
 .dockerignore
 
 # Project specific
-debot_internal/
+internal_docs/
 TODO.md
 TECHNICAL_DOCUMENTATION.md
 Dockerfile.fast
