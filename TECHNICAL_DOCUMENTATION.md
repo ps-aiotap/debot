@@ -1,4 +1,4 @@
-# DHHS AI Domain Expert Chatbot - Technical Documentation
+# AI Domain Expert Chatbot - Technical Documentation
 
 ## Table of Contents
 1. [System Overview](#system-overview)
