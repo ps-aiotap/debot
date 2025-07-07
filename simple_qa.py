@@ -13,7 +13,8 @@ class SimpleQAService:
         self.embedding_service = embedding_service
         self.llm_provider = GroqProvider(
             api_key=os.getenv('GROQ_API_KEY'),
-            model=os.getenv('GROQ_MODEL')
+            model=os.getenv('GROQ_MODEL'),
+            config_path="config.yaml"
         )
     
     def answer_question(self, question: str, use_cache: bool = True, source_filter: str = "all") -> Dict[str, any]:

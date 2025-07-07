@@ -1,8 +1,18 @@
 import requests
+import yaml
 from .base import BaseLLMProvider
 
 class GroqProvider(BaseLLMProvider):
     """Groq provider implementation."""
+    
+    def __init__(self, api_key: str, model: str, config_path: str = "config.yaml"):
+        super().__init__(api_key, model)
+        # Load configuration for LLM parameters
+        try:
+            with open(config_path, 'r') as f:
+                self.config = yaml.safe_load(f)
+        except:
+            self.config = {}
     
     async def generate_response(self, system_prompt: str, user_prompt: str, timeout: int = 30) -> str:
         if not self.api_key:
@@ -13,14 +23,19 @@ class GroqProvider(BaseLLMProvider):
             "Content-Type": "application/json"
         }
         
+        # Get configurable parameters
+        llm_config = self.config.get('llm', {})
+        temperature = llm_config.get('temperature', 0.2)
+        max_tokens = llm_config.get('max_tokens', 800)
+        
         data = {
             "model": self.model,
             "messages": [
                 {"role": "system", "content": system_prompt},
                 {"role": "user", "content": user_prompt}
             ],
-            "temperature": 0.2,
-            "max_tokens": 800
+            "temperature": temperature,
+            "max_tokens": max_tokens
         }
         
         try:
