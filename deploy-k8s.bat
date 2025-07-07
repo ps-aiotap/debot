@@ -14,11 +14,13 @@ REM Skipping postgres.yaml - not needed
 echo Waiting for pods to be ready...
 kubectl wait --for=condition=ready pod -l app=chatbot -n debot --timeout=300s
 
-echo Copying data to pods...
+echo Copying data to pods with proper directory structure...
 cd data
-for /f %%i in ('kubectl get pods -n debot -l app=chatbot -o jsonpath^="{.items[*].metadata.name}"') do (
+for /f %%i in ('kubectl get pods -n debot -l app=chatbot -o jsonpath^="{.items[0].metadata.name}"') do (
     echo Copying to pod: %%i
-    kubectl cp . %%i:/app/data/ -n debot
+    kubectl exec %%i -n debot -- mkdir -p /app/data/docs /app/data/pdfs /app/data/mds
+    kubectl cp . %%i:/app/data/docs/ -n debot
+    echo Documents copied to /app/data/docs/
 )
 cd ..
 

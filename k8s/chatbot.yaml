@@ -30,7 +30,8 @@ spec:
           mountPath: /app/data
       volumes:
       - name: data-volume
-        emptyDir: {}
+        persistentVolumeClaim:
+          claimName: documents-pvc
 
 ---
 apiVersion: v1
