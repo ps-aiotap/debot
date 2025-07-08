@@ -29,7 +29,7 @@ class SimpleEmbeddingService:
             # Try different client initialization for 0.4.15 compatibility
             import requests
 
-            response = requests.get(f"http://{host}:{port}/api/v1/heartbeat")
+            response = requests.get(f"http://{host}:{port}/api/v2/heartbeat")
             print(f"DEBUG: Direct HTTP test: {response.status_code}")
 
             self.chroma_client = chromadb.Client(
