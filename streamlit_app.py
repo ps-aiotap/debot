@@ -4,12 +4,13 @@ import os
 from dotenv import load_dotenv
 from simple_main import SimpleChatbotApp
 
-load_dotenv()
+load_dotenv(override=True)
 
 # Initialize session state
-if 'chatbot' not in st.session_state:
+if "chatbot" not in st.session_state:
     st.session_state.chatbot = None
     st.session_state.initialized = False
+
 
 def initialize_chatbot():
     """Initialize chatbot once and cache it."""
@@ -23,9 +24,22 @@ def initialize_chatbot():
     print("DEBUG: app.initialize() completed")
     return app
 
+
 # Streamlit UI
-st.title("🤖 DHHS AI Domain Expert Chatbot")
-st.markdown("Ask questions about your documents, test cases, and business requirements.")
+st.title("🤖 AI Domain Expert Chatbot")
+st.markdown(
+    "Ask questions about your documents, test cases, and business requirements."
+)
+
+# Debug .env values
+with st.expander("🔧 Environment Debug Info"):
+    st.write(f"**CHROMA_HOST:** {os.getenv('CHROMA_HOST', 'NOT SET')}")
+    st.write(f"**CHROMA_PORT:** {os.getenv('CHROMA_PORT', 'NOT SET')}")
+    st.write(f"**REDIS_HOST:** {os.getenv('REDIS_HOST', 'NOT SET')}")
+    st.write(f"**REDIS_PORT:** {os.getenv('REDIS_PORT', 'NOT SET')}")
+    st.write(f"**GROQ_API_KEY:** {'SET' if os.getenv('GROQ_API_KEY') else 'NOT SET'}")
+    st.write(f"**Working Directory:** {os.getcwd()}")
+    st.write(f"**.env file exists:** {os.path.exists('.env')}")
 
 # Initialize chatbot
 if not st.session_state.initialized:
@@ -61,37 +75,43 @@ if st.session_state.initialized:
             with st.spinner("Thinking..."):
                 try:
                     response = st.session_state.chatbot.ask_question(prompt)
-                    answer = response.get('answer', 'No answer generated.')
-                    sources = response.get('sources', [])
-                    
+                    answer = response.get("answer", "No answer generated.")
+                    sources = response.get("sources", [])
+
                     st.markdown(answer)
-                    
+
                     # Show sources if available
                     if sources:
                         st.markdown("**Sources:**")
                         for i, source in enumerate(sources, 1):
-                            filename = source.get('filename', 'Unknown')
+                            filename = source.get("filename", "Unknown")
                             st.markdown(f"{i}. {filename}")
-                    
+
                     # Add assistant response to chat history
-                    st.session_state.messages.append({"role": "assistant", "content": answer})
-                    
+                    st.session_state.messages.append(
+                        {"role": "assistant", "content": answer}
+                    )
+
                 except Exception as e:
                     error_msg = f"Error: {str(e)}"
                     st.error(error_msg)
-                    st.session_state.messages.append({"role": "assistant", "content": error_msg})
+                    st.session_state.messages.append(
+                        {"role": "assistant", "content": error_msg}
+                    )
 
 # Sidebar with info
 with st.sidebar:
     st.header("ℹ️ Information")
-    st.markdown("""
+    st.markdown(
+        """
     This chatbot can answer questions about:
     - 📄 Your documents (.md, .txt, .docx)
     - 📊 Test cases and business requirements
     - 📋 PDF documents
     - 🌐 Crawled web content
-    """)
-    
+    """
+    )
+
     if st.button("Clear Chat History"):
         st.session_state.messages = []
         st.rerun()

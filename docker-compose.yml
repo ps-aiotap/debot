@@ -2,7 +2,7 @@ services:
   redis:
     image: redis:7-alpine
     ports:
-      - "${REDIS_PORT}:6379"
+      - "6389:6379"
     volumes:
       - redis_data:/data
     healthcheck:
@@ -12,9 +12,9 @@ services:
       retries: 3
 
   chromadb:
-    image: chromadb/chroma:latest
+    image: chromadb/chroma:0.4.15
     ports:
-      - "${CHROMA_PORT}:8000"
+      - "8100:8000"
     volumes:
       - chromadb_data:/chroma/chroma
     environment:

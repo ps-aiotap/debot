@@ -14,17 +14,24 @@ spec:
         app: chatbot
     spec:
       containers:
-      - name: chatbot
-        image: debot:latest
-        imagePullPolicy: IfNotPresent  # Use local image from Docker Desktop
-        command: ["streamlit", "run", "streamlit_app.py", "--server.address", "0.0.0.0"]
-        ports:
-        - containerPort: 8501
-        envFrom:
-        - configMapRef:
-            name: debot-config
-        - secretRef:
-            name: debot-secrets
+        - name: chatbot
+          image: debot:latest
+          imagePullPolicy: IfNotPresent # Use local image from Docker Desktop
+          command:
+            [
+              'streamlit',
+              'run',
+              'streamlit_app.py',
+              '--server.address',
+              '0.0.0.0',
+            ]
+          ports:
+            - containerPort: 8501
+          envFrom:
+            - configMapRef:
+                name: debot-config
+            - secretRef:
+                name: debot-secrets
 
 ---
 apiVersion: v1
@@ -36,6 +43,6 @@ spec:
   selector:
     app: chatbot
   ports:
-  - port: 8501
-    targetPort: 8501
+    - port: 8601
+      targetPort: 8501
   type: LoadBalancer
