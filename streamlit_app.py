@@ -32,14 +32,14 @@ st.markdown(
 )
 
 # Debug .env values
-with st.expander("🔧 Environment Debug Info"):
-    st.write(f"**CHROMA_HOST:** {os.getenv('CHROMA_HOST', 'NOT SET')}")
-    st.write(f"**CHROMA_PORT:** {os.getenv('CHROMA_PORT', 'NOT SET')}")
-    st.write(f"**REDIS_HOST:** {os.getenv('REDIS_HOST', 'NOT SET')}")
-    st.write(f"**REDIS_PORT:** {os.getenv('REDIS_PORT', 'NOT SET')}")
-    st.write(f"**GROQ_API_KEY:** {'SET' if os.getenv('GROQ_API_KEY') else 'NOT SET'}")
-    st.write(f"**Working Directory:** {os.getcwd()}")
-    st.write(f"**.env file exists:** {os.path.exists('.env')}")
+# with st.expander("🔧 Environment Debug Info"):
+#     st.write(f"**CHROMA_HOST:** {os.getenv('CHROMA_HOST', 'NOT SET')}")
+#     st.write(f"**CHROMA_PORT:** {os.getenv('CHROMA_PORT', 'NOT SET')}")
+#     st.write(f"**REDIS_HOST:** {os.getenv('REDIS_HOST', 'NOT SET')}")
+#     st.write(f"**REDIS_PORT:** {os.getenv('REDIS_PORT', 'NOT SET')}")
+#     st.write(f"**GROQ_API_KEY:** {'SET' if os.getenv('GROQ_API_KEY') else 'NOT SET'}")
+#     st.write(f"**Working Directory:** {os.getcwd()}")
+#     st.write(f"**.env file exists:** {os.path.exists('.env')}")
 
 # Initialize chatbot
 if not st.session_state.initialized:
