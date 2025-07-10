@@ -26,35 +26,33 @@ class SimpleEmbeddingService:
         print(f"DEBUG: Connecting to ChromaDB at {host}:{port}")
 
         try:
-            # Try different client initialization for 0.4.15 compatibility
+            # Use direct HTTP client without authentication for older ChromaDB
             import requests
 
-            response = requests.get(f"http://{host}:{port}/api/v2/heartbeat")
+            response = requests.get(f"http://{host}:{port}/api/v1/heartbeat")
             print(f"DEBUG: Direct HTTP test: {response.status_code}")
 
-            self.chroma_client = chromadb.Client(
-                chromadb.config.Settings(
-                    chroma_api_impl="chromadb.api.fastapi.FastAPI",
-                    chroma_server_host=host,
-                    chroma_server_http_port=str(port),
-                )
+            # Create client with minimal settings to avoid auth issues
+            settings = chromadb.config.Settings(
+                chroma_api_impl="chromadb.api.fastapi.FastAPI",
+                chroma_server_host=host,
+                chroma_server_http_port=str(port),
+                anonymized_telemetry=False,
+                allow_reset=True
             )
-            print("DEBUG: ChromaDB client created with Settings")
+            
+            self.chroma_client = chromadb.HttpClient(
+                host=host, 
+                port=port,
+                settings=settings
+            )
+            print("DEBUG: ChromaDB HttpClient created")
             self.collection = self.chroma_client.get_or_create_collection("documents")
             print("DEBUG: ChromaDB collection created/retrieved")
         except Exception as e:
             print(f"DEBUG: ChromaDB connection failed: {e}")
             print(f"DEBUG: Error type: {type(e)}")
-            # Fallback to HttpClient
-            try:
-                self.chroma_client = chromadb.HttpClient(host=host, port=port)
-                self.collection = self.chroma_client.get_or_create_collection(
-                    "documents"
-                )
-                print("DEBUG: Fallback HttpClient worked")
-            except Exception as e2:
-                print(f"DEBUG: Fallback also failed: {e2}")
-                raise e2
+            raise e
 
     def get_embedding(self, text: str) -> List[float]:
         """Get embedding with Redis caching."""
