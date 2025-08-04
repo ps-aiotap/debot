@@ -13,17 +13,38 @@ from ingest.load_azure_wiki import load_azure_devops_wiki
 from simple_embedding import SimpleEmbeddingService
 from simple_qa import SimpleQAService
 from database import create_tables
+from persona_manager import PersonaManager
 
 load_dotenv()
 create_tables()
 
 class SimpleChatbotApp:
-    def __init__(self, config_path: str = "config.yaml"):
+    def __init__(self, config_path: str = "config.yaml", persona_manager: PersonaManager = None):
         with open(config_path, 'r') as f:
             self.config = yaml.safe_load(f)
         
-        self.embedding_service = SimpleEmbeddingService()
+        # Initialize persona manager
+        self.persona_manager = persona_manager or PersonaManager()
+        
+        # Initialize services with persona manager
+        self.embedding_service = SimpleEmbeddingService(config_path=config_path, persona_manager=self.persona_manager)
         self.qa_service = SimpleQAService(self.embedding_service)
+        
+    def set_persona(self, persona_name: str) -> bool:
+        """Set the active persona."""
+        success = self.persona_manager.set_persona(persona_name)
+        if success:
+            # Reinitialize collections for the new persona
+            self.embedding_service._initialize_collections()
+        return success
+        
+    def get_current_persona(self) -> str:
+        """Get the name of the current persona."""
+        return self.persona_manager.get_current_persona()
+        
+    def get_available_personas(self) -> List[str]:
+        """Get list of available personas."""
+        return self.persona_manager.get_available_personas()
     
     async def ingest_all_data(self) -> List[Dict[str, str]]:
         """Ingest data from all sources."""
@@ -111,7 +132,29 @@ class SimpleChatbotApp:
 
 # CLI interface
 def main():
-    app = SimpleChatbotApp()
+    import argparse
+    
+    # Parse command line arguments
+    parser = argparse.ArgumentParser(description="DeBot CLI")
+    parser.add_argument("--persona", help="Persona to use", default=None)
+    args = parser.parse_args()
+    
+    # Initialize persona manager
+    persona_manager = PersonaManager()
+    
+    # Set persona if specified
+    if args.persona:
+        if not persona_manager.set_persona(args.persona):
+            print(f"Warning: Persona '{args.persona}' not found. Using {persona_manager.get_current_persona()}.")
+        else:
+            print(f"Using persona: {args.persona}")
+    
+    # Initialize app with persona manager
+    app = SimpleChatbotApp(persona_manager=persona_manager)
+    
+    # Show active collections
+    print(f"Active collections: {persona_manager.get_collections()}")
+    print(f"Prompt style: {persona_manager.get_prompt_style()}")
     
     success = asyncio.run(app.initialize())
     if not success:

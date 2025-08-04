@@ -1,0 +1,14 @@
+{
+  "mugdha": {
+    "collections": ["therapy_docs"],
+    "prompt_style": "gentle"
+  },
+  "praveen": {
+    "collections": ["enterprise_docs", "core_docs"],
+    "prompt_style": "direct"
+  },
+  "default": {
+    "collections": ["documents"],
+    "prompt_style": "balanced"
+  }
+}

@@ -20,9 +20,13 @@ class SimpleQAService:
     def answer_question(self, question: str, use_cache: bool = True, source_filter: str = "all") -> Dict[str, any]:
         """Answer question using RAG with Groq."""
         
-        # Check cache
+        # Get current persona info
+        persona = self.embedding_service.persona_manager.get_current_persona()
+        prompt_style = self.embedding_service.persona_manager.get_prompt_style()
+        
+        # Check cache with persona info
         if use_cache:
-            cached_response = get_cached_response(question, {"source_filter": source_filter}, "groq")
+            cached_response = get_cached_response(question, {"source_filter": source_filter, "persona": persona}, "groq")
             if cached_response:
                 return {"answer": cached_response, "sources": [], "cached": True}
         
@@ -43,9 +47,17 @@ class SimpleQAService:
         if not results:
             return {"answer": "I couldn't find relevant information to answer your question.", "sources": [], "cached": False}
         
-        # Generate answer using Groq
+        # Generate answer using Groq with persona-specific prompt style
         context = "\n\n".join([result['content'][:500] for result in results[:3]])
-        system_prompt = "You are a helpful assistant. Answer the question based on the provided context."
+        
+        # Adjust system prompt based on persona style
+        if prompt_style == "gentle":
+            system_prompt = "You are a helpful and empathetic assistant. Answer the question based on the provided context using a warm, supportive tone."
+        elif prompt_style == "direct":
+            system_prompt = "You are a direct and concise assistant. Answer the question based on the provided context with clear, straightforward information."
+        else:  # balanced
+            system_prompt = "You are a helpful assistant. Answer the question based on the provided context."
+            
         user_prompt = f"Context: {context}\n\nQuestion: {question}"
         
         try:
@@ -63,8 +75,8 @@ class SimpleQAService:
                 "content_preview": result['content'][:200] + "..." if len(result['content']) > 200 else result['content']
             })
         
-        # Cache response
+        # Cache response with persona info
         if use_cache:
-            cache_response(question, {"source_filter": source_filter}, "groq", answer)
+            cache_response(question, {"source_filter": source_filter, "persona": persona}, "groq", answer)
         
         return {"answer": answer, "sources": sources, "cached": False}

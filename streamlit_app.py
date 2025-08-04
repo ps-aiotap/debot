@@ -3,6 +3,7 @@ import asyncio
 import os
 from dotenv import load_dotenv
 from simple_main import SimpleChatbotApp
+from persona_manager import PersonaManager
 
 load_dotenv(override=True)
 
@@ -12,10 +13,10 @@ if "chatbot" not in st.session_state:
     st.session_state.initialized = False
 
 
-def initialize_chatbot():
+def initialize_chatbot(persona_manager=None):
     """Initialize chatbot once and cache it."""
     print("DEBUG: Starting chatbot initialization")
-    app = SimpleChatbotApp()
+    app = SimpleChatbotApp(persona_manager=persona_manager)
     print("DEBUG: SimpleChatbotApp created")
     loop = asyncio.new_event_loop()
     asyncio.set_event_loop(loop)
@@ -41,11 +42,15 @@ st.markdown(
 #     st.write(f"**Working Directory:** {os.getcwd()}")
 #     st.write(f"**.env file exists:** {os.path.exists('.env')}")
 
+# Initialize persona manager
+if "persona_manager" not in st.session_state:
+    st.session_state.persona_manager = PersonaManager()
+
 # Initialize chatbot
 if not st.session_state.initialized:
     with st.spinner("Initializing chatbot..."):
         try:
-            st.session_state.chatbot = initialize_chatbot()
+            st.session_state.chatbot = initialize_chatbot(st.session_state.persona_manager)
             st.session_state.initialized = True
             st.success("Chatbot initialized successfully!")
         except Exception as e:
@@ -102,6 +107,33 @@ if st.session_state.initialized:
 # Sidebar with info
 with st.sidebar:
     st.header("ℹ️ Information")
+    
+    # Persona selector
+    st.subheader("👤 Persona Settings")
+    available_personas = st.session_state.persona_manager.get_available_personas()
+    current_persona = st.session_state.persona_manager.get_current_persona()
+    
+    selected_persona = st.selectbox(
+        "Select Persona",
+        available_personas,
+        index=available_personas.index(current_persona) if current_persona in available_personas else 0
+    )
+    
+    # Change persona if selection changed
+    if selected_persona != current_persona:
+        if st.session_state.persona_manager.set_persona(selected_persona):
+            st.session_state.chatbot = None
+            st.session_state.initialized = False
+            st.rerun()
+    
+    # Display active collections
+    st.write("**Active Collections:**")
+    for collection in st.session_state.persona_manager.get_collections():
+        st.write(f"- {collection}")
+    
+    # Display prompt style
+    st.write(f"**Prompt Style:** {st.session_state.persona_manager.get_prompt_style()}")
+    
     st.markdown(
         """
     This chatbot can answer questions about:
