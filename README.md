@@ -2,7 +2,36 @@
 
 A production-ready AI chatbot that answers domain-specific queries using private documentation and selected public websites, built with Retrieval-Augmented Generation (RAG) architecture.
 
-🎥 **[Watch Demo Video](https://www.loom.com/share/3fa6fbd73fb542b7840c42037b22c024)**
+## Demo
+
+▶️ [Watch the demo] **[Watch Demo Video](https://www.loom.com/share/3fa6fbd73fb542b7840c42037b22c024)**
+This short video walks through the main features
+
+## 🔄 Features
+
+### Data Ingestion
+
+- **Multi-format support**: PDF, Markdown, Text, Excel/CSV
+- **Web crawling**: Async crawling with robots.txt compliance
+- **SharePoint integration**: Direct document access
+- **Azure DevOps Wiki**: Wiki page ingestion
+- **Incremental updates**: Smart re-indexing based on content changes
+
+### AI & Search
+
+- **RAG Pipeline**: Retrieval-Augmented Generation
+- **Vector Search**: Semantic similarity with ChromaDB
+- **Caching**: Redis-based response and embedding cache
+- **Multiple LLM Support**: OpenAI, Groq, and extensible providers
+- **Source Attribution**: Automatic citation of source documents
+
+### User Interface
+
+- **Streamlit Web UI**: Interactive chat interface
+- **CLI Interface**: Command-line interaction
+- **Debug Tools**: Environment and connectivity diagnostics
+- **Chat History**: Persistent conversation memory
+- **Source Filtering**: Filter by document type or source
 
 ## 🏗️ Architecture
 
@@ -215,32 +244,6 @@ kubectl apply -f k8s/chatbot.yaml
 # Access the application
 kubectl port-forward svc/chatbot-service 8502:8502 -n debot
 ```
-
-## 🔄 Features
-
-### Data Ingestion
-
-- **Multi-format support**: PDF, Markdown, Text, Excel/CSV
-- **Web crawling**: Async crawling with robots.txt compliance
-- **SharePoint integration**: Direct document access
-- **Azure DevOps Wiki**: Wiki page ingestion
-- **Incremental updates**: Smart re-indexing based on content changes
-
-### AI & Search
-
-- **RAG Pipeline**: Retrieval-Augmented Generation
-- **Vector Search**: Semantic similarity with ChromaDB
-- **Caching**: Redis-based response and embedding cache
-- **Multiple LLM Support**: OpenAI, Groq, and extensible providers
-- **Source Attribution**: Automatic citation of source documents
-
-### User Interface
-
-- **Streamlit Web UI**: Interactive chat interface
-- **CLI Interface**: Command-line interaction
-- **Debug Tools**: Environment and connectivity diagnostics
-- **Chat History**: Persistent conversation memory
-- **Source Filtering**: Filter by document type or source
 
 ## 🧪 Development
 
