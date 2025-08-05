@@ -17,7 +17,7 @@ class SimpleQAService:
             config_path="config.yaml"
         )
     
-    def answer_question(self, question: str, use_cache: bool = True, source_filter: str = "all") -> Dict[str, any]:
+    async def answer_question(self, question: str, use_cache: bool = True, source_filter: str = "all") -> Dict[str, any]:
         """Answer question using RAG with Groq."""
         
         # Get current persona info
@@ -61,13 +61,16 @@ class SimpleQAService:
         user_prompt = f"Context: {context}\n\nQuestion: {question}"
         
         try:
-            answer = asyncio.run(self.llm_provider.generate_response(system_prompt, user_prompt))
+            answer = await self.llm_provider.generate_response(system_prompt, user_prompt)
         except Exception as e:
             answer = f"Error generating response: {str(e)}"
         
-        # Extract sources
+        # Extract sources (filter out hash documents)
         sources = []
         for result in results:
+            # Skip content hash documents
+            if result['metadata'].get('type') == 'hash':
+                continue
             sources.append({
                 "filename": result['metadata'].get('filename', 'Unknown'),
                 "source": result['metadata'].get('source', 'Unknown'),

@@ -53,6 +53,13 @@ class PersonaManager:
 
     def get_current_persona(self) -> str:
         return self.current_persona
+    
+    def get_data_dir(self) -> str:
+        """Get data directory for the current persona."""
+        try:
+            return self.personas[self.current_persona]["data_dir"]
+        except (KeyError, TypeError):
+            return "./data"
 
     def _save_last_used_persona(self) -> None:
         try:

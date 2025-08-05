@@ -47,35 +47,44 @@ class SimpleChatbotApp:
         return self.persona_manager.get_available_personas()
     
     async def ingest_all_data(self) -> List[Dict[str, str]]:
-        """Ingest data from all sources."""
+        """Ingest data from persona-specific sources."""
         all_documents = []
         
-        # Load documents from DOCS_DIR
-        if os.getenv('DOCS_DIR'):
-            print("Loading documents from DOCS_DIR...")
-            docs = load_documents(os.getenv('DOCS_DIR'))
+        # Get persona-specific data directory
+        persona_data_dir = self.persona_manager.get_data_dir()
+        print(f"Loading data for persona '{self.persona_manager.get_current_persona()}' from {persona_data_dir}")
+        
+        # Load documents from persona docs directory
+        docs_dir = os.path.join(persona_data_dir, 'docs')
+        if os.path.exists(docs_dir):
+            print(f"Loading documents from {docs_dir}...")
+            docs = load_documents(docs_dir)
             all_documents.extend(docs)
-            print(f"Loaded {len(docs)} documents from DOCS_DIR")
+            print(f"Loaded {len(docs)} documents from docs directory")
         
-        # Load documents from MDS_DIR
-        if os.getenv('MDS_DIR'):
-            print("Loading documents from MDS_DIR...")
-            mds_docs = load_documents(os.getenv('MDS_DIR'))
+        # Load documents from persona mds directory
+        mds_dir = os.path.join(persona_data_dir, 'mds')
+        if os.path.exists(mds_dir):
+            print(f"Loading markdown documents from {mds_dir}...")
+            mds_docs = load_documents(mds_dir)
             all_documents.extend(mds_docs)
-            print(f"Loaded {len(mds_docs)} documents from MDS_DIR")
+            print(f"Loaded {len(mds_docs)} markdown documents")
         
-        # Load Excel/CSV test cases
-        if os.getenv('EXCEL_DIR'):
-            print("Loading Excel/CSV test cases...")
-            excel_docs = load_excel_testcases(os.getenv('EXCEL_DIR'))
+        # Load PDFs from persona pdfs directory
+        pdfs_dir = os.path.join(persona_data_dir, 'pdfs')
+        if os.path.exists(pdfs_dir):
+            print(f"Loading PDFs from {pdfs_dir}...")
+            pdfs = load_pdfs(pdfs_dir)
+            all_documents.extend(pdfs)
+            print(f"Loaded {len(pdfs)} PDFs")
+        
+        # Load Excel/CSV test cases from persona directory
+        excel_dir = os.path.join(persona_data_dir, 'excel')
+        if os.path.exists(excel_dir):
+            print(f"Loading Excel/CSV test cases from {excel_dir}...")
+            excel_docs = load_excel_testcases(excel_dir)
             all_documents.extend(excel_docs)
             print(f"Loaded {len(excel_docs)} test case documents")
-        
-        # Load PDFs
-        print("Loading PDFs...")
-        pdfs = load_pdfs(os.getenv('PDF_DIR', './data/pdfs'))
-        all_documents.extend(pdfs)
-        print(f"Loaded {len(pdfs)} PDFs")
         
         # Crawl websites
         print("Crawling websites...")
@@ -126,9 +135,9 @@ class SimpleChatbotApp:
             print("No documents found.")
             return False
     
-    def ask_question(self, question: str, use_cache: bool = True, source_filter: str = "all") -> Dict[str, any]:
+    async def ask_question(self, question: str, use_cache: bool = True, source_filter: str = "all") -> Dict[str, any]:
         """Ask a question to the chatbot."""
-        return self.qa_service.answer_question(question, use_cache, source_filter)
+        return await self.qa_service.answer_question(question, use_cache, source_filter)
 
 # CLI interface
 def main():
@@ -167,7 +176,7 @@ def main():
         if question.lower() in ['quit', 'exit']:
             break
         
-        response = app.ask_question(question)
+        response = asyncio.run(app.ask_question(question))
         print(f"\nAnswer: {response['answer']}")
         if response['sources']:
             print(f"\nSources ({len(response['sources'])}):")

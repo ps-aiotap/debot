@@ -4,8 +4,37 @@ A production-ready AI chatbot that answers domain-specific queries using private
 
 ## Demo
 
-▶️ [Watch the demo] **[Watch Demo Video](https://www.loom.com/share/3fa6fbd73fb542b7840c42037b22c024)**
-This short video walks through the main features
+▶️ **[Watch Demo Video](https://www.loom.com/share/3fa6fbd73fb542b7840c42037b22c024)**
+
+## 🌟 What Makes DeBot Special
+
+DeBot isn't just another chatbot - it's a sophisticated AI system designed for organizations that need intelligent access to their private knowledge base:
+
+### 🎭 **Persona-Based Intelligence**
+- **Multi-Persona Support**: Switch between different expert personas (therapy, real estate, digital marketing, enterprise)
+- **Contextual Responses**: Each persona uses domain-specific language, tone, and expertise
+- **Isolated Knowledge**: Each persona accesses only relevant document collections
+- **Customizable Prompt Styles**: Gentle, professional, creative, or direct communication styles
+
+### 🧠 **Advanced AI Capabilities**
+- **Semantic Understanding**: Uses state-of-the-art sentence transformers for deep document comprehension
+- **Multi-Collection Search**: Simultaneously searches across multiple document repositories
+- **Source Attribution**: Every answer includes citations with document references
+- **Context-Aware Responses**: Maintains conversation history and context
+- **Intelligent Caching**: Redis-powered caching for lightning-fast responses
+
+### 📚 **Comprehensive Data Ingestion**
+- **Universal Format Support**: PDFs, Markdown, Word docs, Excel/CSV, plain text
+- **Web Content Crawling**: Intelligent web scraping with robots.txt compliance
+- **SharePoint Integration**: Direct access to corporate SharePoint documents
+- **Azure DevOps Wiki**: Seamless integration with development documentation
+- **Incremental Updates**: Smart re-indexing detects content changes automatically
+
+### 🔒 **Enterprise-Grade Security**
+- **Private Data Processing**: All documents remain within your infrastructure
+- **No Data Leakage**: Persona-based isolation ensures data segregation
+- **API Key Management**: Secure credential handling via environment variables
+- **Network Isolation**: Docker/Kubernetes deployments with network security
 
 ## 🔄 Features
 
@@ -102,6 +131,11 @@ This short video walks through the main features
 
    # CLI Interface
    python main.py
+   
+   # CLI with specific persona
+   python main.py --persona mugdha
+   python main.py --persona real_estate
+   python main.py --persona digital_marketing
    ```
 
 ## 📁 Project Structure
@@ -175,6 +209,28 @@ embedding:
 retrieval:
   top_k: 5
   similarity_threshold: 0.7
+```
+
+### Persona Configuration (persona_config.json)
+
+```json
+{
+  "mugdha": {
+    "collections": ["therapy_docs"],
+    "prompt_style": "gentle",
+    "data_dir": "./data/mugdha"
+  },
+  "real_estate": {
+    "collections": ["property_docs", "market_analysis"],
+    "prompt_style": "professional",
+    "data_dir": "./data/real_estate"
+  },
+  "digital_marketing": {
+    "collections": ["marketing_docs", "campaign_data"],
+    "prompt_style": "creative",
+    "data_dir": "./data/digital_marketing"
+  }
+}
 ```
 
 ## 🔧 Usage
@@ -318,14 +374,53 @@ This project is licensed under the MIT License - see the [LICENSE](LICENSE) file
 - **Issues**: Report bugs via GitHub Issues
 - **Discussions**: Join community discussions in GitHub Discussions
 
-## 🎯 Roadmap
+## 🎯 Use Cases & Applications
 
-- [ ] Multi-tenant support
-- [ ] Advanced analytics dashboard
-- [ ] Integration with more data sources
-- [ ] Fine-tuning capabilities
-- [ ] Mobile-responsive UI
-- [ ] API rate limiting and quotas
+### 🏥 Healthcare & Therapy
+- **Patient Education**: Instant access to treatment protocols and health information
+- **Clinical Decision Support**: Evidence-based recommendations from medical literature
+- **Therapy Session Prep**: Quick reference to patient history and treatment plans
+- **Compliance Documentation**: Regulatory and compliance information at fingertips
+
+### 🏢 Real Estate & Property
+- **Market Analysis**: Instant access to market trends, pricing data, and investment opportunities
+- **Regulatory Compliance**: Zoning laws, building codes, and municipal regulations
+- **Client Consultation**: Quick property comparisons and investment advice
+- **Due Diligence**: Comprehensive property research and risk assessment
+
+### 📱 Digital Marketing
+- **Campaign Strategy**: Access to successful campaign templates and best practices
+- **Market Research**: Consumer behavior insights and competitive analysis
+- **Content Creation**: Brand guidelines, messaging frameworks, and creative briefs
+- **Performance Analytics**: KPI benchmarks and optimization strategies
+
+### 🏭 Enterprise & Corporate
+- **Employee Onboarding**: Company policies, procedures, and training materials
+- **Technical Documentation**: API docs, system architecture, and troubleshooting guides
+- **Compliance Training**: Regulatory requirements and audit preparation
+- **Knowledge Management**: Institutional knowledge preservation and sharing
+
+## 🎯 Roadmap & Future Enhancements
+
+### 🚀 Immediate (Next Release)
+- [ ] **Advanced Analytics Dashboard**: Real-time usage metrics and performance insights
+- [ ] **Mobile-Responsive UI**: Optimized interface for tablets and smartphones
+- [ ] **API Rate Limiting**: Request throttling and quota management
+- [ ] **Bulk Document Upload**: Drag-and-drop interface for multiple file uploads
+
+### 🔮 Short Term (3-6 months)
+- [ ] **Multi-Tenant Architecture**: Support for multiple organizations with data isolation
+- [ ] **Advanced Search Filters**: Date ranges, document types, and custom metadata filters
+- [ ] **Integration Marketplace**: Pre-built connectors for popular enterprise systems
+- [ ] **Custom Model Fine-Tuning**: Domain-specific model training capabilities
+- [ ] **Workflow Automation**: Automated document processing and indexing pipelines
+
+### 🌟 Long Term (6-12 months)
+- [ ] **Federated Search**: Search across multiple DeBot instances
+- [ ] **Advanced NLP Features**: Named entity recognition and relationship extraction
+- [ ] **Voice Interface**: Speech-to-text and text-to-speech capabilities
+- [ ] **Collaborative Features**: Shared workspaces and team annotations
+- [ ] **Advanced Security**: SSO integration, RBAC, and audit trails
 
 ---
 

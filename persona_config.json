@@ -1,14 +1,27 @@
 {
   "mugdha": {
     "collections": ["therapy_docs"],
-    "prompt_style": "gentle"
+    "prompt_style": "gentle",
+    "data_dir": "./data/mugdha"
   },
   "praveen": {
     "collections": ["enterprise_docs", "core_docs"],
-    "prompt_style": "direct"
+    "prompt_style": "direct",
+    "data_dir": "./data/praveen"
+  },
+  "real_estate": {
+    "collections": ["property_docs", "market_analysis"],
+    "prompt_style": "professional",
+    "data_dir": "./data/real_estate"
+  },
+  "digital_marketing": {
+    "collections": ["marketing_docs", "campaign_data"],
+    "prompt_style": "creative",
+    "data_dir": "./data/digital_marketing"
   },
   "default": {
     "collections": ["documents"],
-    "prompt_style": "balanced"
+    "prompt_style": "balanced",
+    "data_dir": "./data"
   }
 }

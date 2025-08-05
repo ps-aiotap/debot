@@ -79,18 +79,28 @@ if st.session_state.initialized:
         with st.chat_message("assistant"):
             with st.spinner("Thinking..."):
                 try:
-                    response = st.session_state.chatbot.ask_question(prompt)
+                    loop = asyncio.new_event_loop()
+                    asyncio.set_event_loop(loop)
+                    response = loop.run_until_complete(st.session_state.chatbot.ask_question(prompt, use_cache=False))
                     answer = response.get("answer", "No answer generated.")
                     sources = response.get("sources", [])
+                    
+
 
                     st.markdown(answer)
 
-                    # Show sources if available
+                    # Show sources if available (filter out hash documents)
                     if sources:
-                        st.markdown("**Sources:**")
-                        for i, source in enumerate(sources, 1):
-                            filename = source.get("filename", "Unknown")
-                            st.markdown(f"{i}. {filename}")
+                        # Filter out content hash documents
+                        actual_sources = [s for s in sources if s.get('type') != 'hash']
+                        if actual_sources:
+                            st.markdown("**Sources:**")
+                            for i, source in enumerate(actual_sources, 1):
+                                filename = source.get("filename", "Unknown")
+                                doc_type = source.get("type", "Unknown")
+                                st.markdown(f"{i}. {filename} ({doc_type})")
+                        else:
+                            st.markdown("*No document sources found*")
 
                     # Add assistant response to chat history
                     st.session_state.messages.append(
