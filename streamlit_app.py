@@ -13,9 +13,11 @@ if "chatbot" not in st.session_state:
     st.session_state.initialized = False
 
 
-def initialize_chatbot(persona_manager=None):
+def initialize_chatbot(persona_manager=None, force_reindex=False):
     """Initialize chatbot once and cache it."""
     print("DEBUG: Starting chatbot initialization")
+    if force_reindex:
+        os.environ["FORCE_REINDEX"] = "true"
     app = SimpleChatbotApp(persona_manager=persona_manager)
     print("DEBUG: SimpleChatbotApp created")
     loop = asyncio.new_event_loop()
@@ -48,9 +50,9 @@ if "persona_manager" not in st.session_state:
 
 # Initialize chatbot
 if not st.session_state.initialized:
-    with st.spinner("Initializing chatbot..."):
+    with st.spinner("Initializing chatbot and indexing documents..."):
         try:
-            st.session_state.chatbot = initialize_chatbot(st.session_state.persona_manager)
+            st.session_state.chatbot = initialize_chatbot(st.session_state.persona_manager, force_reindex=True)
             st.session_state.initialized = True
             st.success("Chatbot initialized successfully!")
         except Exception as e:

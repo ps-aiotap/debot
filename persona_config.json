@@ -19,6 +19,31 @@
     "prompt_style": "creative",
     "data_dir": "./data/digital_marketing"
   },
+  "northern_trust": {
+    "collections": ["northern_trust_docs"],
+    "prompt_style": "professional",
+    "data_dir": "./data/northern_trust"
+  },
+  "viswak_realty": {
+    "collections": ["viswak_realty_docs"],
+    "prompt_style": "professional",
+    "data_dir": "./data/viswak_realty"
+  },
+  "pyrite_digital": {
+    "collections": ["pyrite_digital_docs"],
+    "prompt_style": "creative",
+    "data_dir": "./data/pyrite_digital"
+  },
+  "ithrive_avinash": {
+    "collections": ["ithrive_avinash_docs"],
+    "prompt_style": "professional",
+    "data_dir": "./data/ithrive_healthcare"
+  },
+  "ithrive_mugdha": {
+    "collections": ["ithrive_mugdha_docs"],
+    "prompt_style": "gentle",
+    "data_dir": "./data/ithrive_healthcare"
+  },
   "default": {
     "collections": ["documents"],
     "prompt_style": "balanced",

@@ -54,6 +54,7 @@ class SimpleChatbotApp:
         persona_data_dir = self.persona_manager.get_data_dir()
         print(f"Loading data for persona '{self.persona_manager.get_current_persona()}' from {persona_data_dir}")
         
+
         # Load documents from persona docs directory
         docs_dir = os.path.join(persona_data_dir, 'docs')
         if os.path.exists(docs_dir):
