@@ -4,6 +4,7 @@ from typing import List, Dict, Optional
 from llama_index.core import VectorStoreIndex
 from llama_index.core.retrievers import VectorIndexRetriever
 from cache_utils import get_cached_response, cache_response
+from explainability import ExplainabilityService
 
 class QAService:
     def __init__(self, index: VectorStoreIndex, config_path: str = "config.yaml"):
@@ -25,10 +26,14 @@ class QAService:
             similarity_top_k=self.config['retrieval']['top_k']
         )
         
+        # Initialize explainability service
+        from embedding_service import EmbeddingService
+        self.explainability = ExplainabilityService(EmbeddingService())
+        
         # Note: Using simple retrieval without LlamaIndex query engine
         # Will generate answers using Groq provider directly
     
-    def answer_question(self, question: str, use_cache: bool = True, source_filter: str = "all") -> Dict[str, any]:
+    def answer_question(self, question: str, use_cache: bool = True, source_filter: str = "all", explain: bool = False) -> Dict[str, any]:
         """Answer question using RAG with optional caching."""
         
         # Check cache if enabled
@@ -94,8 +99,28 @@ class QAService:
                 ttl=int(os.getenv('RESPONSE_CACHE_TTL', 3600))
             )
         
-        return {
+        result = {
             "answer": answer,
             "sources": sources,
             "cached": False
         }
+        
+        # Add explainability if requested
+        if explain:
+            from embedding_service import EmbeddingService
+            embedding_service = EmbeddingService()
+            query_embedding = embedding_service.get_embedding(question)
+            
+            # Convert nodes to dict format for explainability
+            retrieved_docs = []
+            for node in retrieved_nodes:
+                retrieved_docs.append({
+                    'text': node.text,
+                    'source': node.metadata.get('filename', 'Unknown'),
+                    'embedding': node.embedding
+                })
+            
+            explanation = self.explainability.explain_retrieval(question, retrieved_docs, query_embedding)
+            result["explanation"] = explanation
+        
+        return result

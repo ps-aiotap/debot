@@ -83,9 +83,11 @@ if st.session_state.initialized:
                 try:
                     loop = asyncio.new_event_loop()
                     asyncio.set_event_loop(loop)
-                    response = loop.run_until_complete(st.session_state.chatbot.ask_question(prompt, use_cache=False))
+                    # Enable explainability for debugging
+                    response = loop.run_until_complete(st.session_state.chatbot.ask_question(prompt, use_cache=False, explain=True))
                     answer = response.get("answer", "No answer generated.")
                     sources = response.get("sources", [])
+                    explanation = response.get("explanation")
                     
 
 
@@ -103,6 +105,29 @@ if st.session_state.initialized:
                                 st.markdown(f"{i}. {filename} ({doc_type})")
                         else:
                             st.markdown("*No document sources found*")
+                    
+                    # Show explainability if available
+                    if explanation:
+                        with st.expander("🔍 Why these documents were selected", expanded=False):
+                            st.write(f"**Query:** {explanation['query']}")
+                            st.write(f"**Documents Retrieved:** {explanation['total_docs_retrieved']}")
+                            
+                            if explanation.get('potential_issues'):
+                                st.warning("**Potential Issues:**")
+                                for issue in explanation['potential_issues']:
+                                    st.write(f"⚠️ {issue}")
+                            
+                            st.write("**Document Analysis:**")
+                            for exp in explanation['explanations']:
+                                with st.container():
+                                    st.write(f"**📄 {exp['document']}**")
+                                    st.write(f"- Similarity Score: {exp['similarity_score']}")
+                                    st.write(f"- Reason: {exp['relevance_reason']}")
+                                    if exp['keyword_matches']:
+                                        st.write(f"- Keywords: {', '.join(exp['keyword_matches'][:5])}")
+                                    if exp['location_mismatch']:
+                                        st.error(f"⚠️ Location mismatch: Query locations {exp['query_locations']} vs Doc locations {exp['doc_locations']}")
+                                    st.divider()
 
                     # Add assistant response to chat history
                     st.session_state.messages.append(
@@ -146,6 +171,11 @@ with st.sidebar:
     # Display prompt style
     st.write(f"**Prompt Style:** {st.session_state.persona_manager.get_prompt_style()}")
     
+    # Explainability toggle
+    st.subheader("🔍 Debug Options")
+    if st.checkbox("Show retrieval explanations", value=True):
+        st.write("Explanations will show why documents were selected")
+    
     st.markdown(
         """
     This chatbot can answer questions about:
@@ -158,4 +188,9 @@ with st.sidebar:
 
     if st.button("Clear Chat History"):
         st.session_state.messages = []
+        st.rerun()
+    
+    if st.button("🔄 Reinitialize Chatbot"):
+        st.session_state.chatbot = None
+        st.session_state.initialized = False
         st.rerun()
