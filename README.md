@@ -2,10 +2,6 @@
 
 A production-ready AI chatbot that answers domain-specific queries using private documentation and selected public websites, built with Retrieval-Augmented Generation (RAG) architecture.
 
-## Demo
-
-▶️ **[Watch Demo Video](https://www.loom.com/share/3fa6fbd73fb542b7840c42037b22c024)**
-
 ## 🌟 What Makes DeBot Special
 
 DeBot isn't just another chatbot - it's a sophisticated AI system designed for organizations that need intelligent access to their private knowledge base:
