@@ -14,16 +14,30 @@ load_dotenv(override=True)
 
 app = FastAPI(title="DeBot API", version="1.0.0")
 
+# Get frontend port from environment
+frontend_port = os.getenv('FRONTEND_PORT', '5173')
+api_port = os.getenv('API_PORT', '8000')
+
 app.add_middleware(
     CORSMiddleware,
-    allow_origins=["http://localhost:5173", "http://localhost:3000"],
+    allow_origins=[f"http://localhost:{frontend_port}", "http://localhost:3000"],
     allow_credentials=True,
     allow_methods=["*"],
     allow_headers=["*"],
 )
 
+# Define routes first
+@app.get("/")
+def root():
+    return {"message": "DeBot API", "docs": "/docs", "health": "/health"}
+
+@app.get("/health")
+def health_check():
+    return {"status": "healthy"}
+
 chatbot_app = None
-persona_manager = PersonaManager()
+persona_config_path = os.path.join("..", "persona_config.json")
+persona_manager = PersonaManager(config_path=persona_config_path)
 
 class ChatRequest(BaseModel):
     message: str
@@ -38,12 +52,16 @@ class ChatResponse(BaseModel):
 @app.on_event("startup")
 async def startup_event():
     global chatbot_app
-    chatbot_app = SimpleChatbotApp(persona_manager=persona_manager)
-    await chatbot_app.initialize()
+    try:
+        config_path = os.path.join("..", "config.yaml")
+        chatbot_app = SimpleChatbotApp(config_path=config_path, persona_manager=persona_manager)
+        await chatbot_app.initialize()
+        print("✅ Chatbot initialized successfully")
+    except Exception as e:
+        print(f"⚠️ Chatbot initialization failed: {e}")
+        chatbot_app = None
 
-@app.get("/health")
-async def health_check():
-    return {"status": "healthy"}
+
 
 @app.get("/personas")
 async def get_personas():
@@ -67,8 +85,7 @@ async def chat(request: ChatRequest):
     try:
         response = await chatbot_app.ask_question(
             request.message, 
-            use_cache=False, 
-            explain=request.explain
+            use_cache=False
         )
         
         return ChatResponse(

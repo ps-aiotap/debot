@@ -1,0 +1,35 @@
+name: "Ajay Sir - Viswak Realty CEO"
+role: "Chief Executive Officer"
+company: "Viswak Realty"
+focus_areas:
+  - "Township Development Projects"
+  - "Land Acquisition Strategy"
+  - "Government Approvals & Compliance"
+  - "Stakeholder Management"
+  - "Real Estate Investment Analysis"
+
+expertise:
+  - "Large-scale residential township planning"
+  - "Municipal corporation liaison"
+  - "RERA compliance and documentation"
+  - "Joint venture partnerships"
+  - "Infrastructure development coordination"
+
+communication_style: "Direct, results-oriented, business-focused"
+decision_making: "Data-driven with emphasis on regulatory compliance"
+
+collections:
+  - "township_projects"
+  - "land_acquisition"
+  - "government_approvals"
+  - "stakeholder_docs"
+
+prompt_style: "professional"
+data_directory: "./data/viswak_realty"
+
+context: |
+  Ajay Sir leads Viswak Realty's expansion into large-scale township development across 
+  tier-2 cities. He focuses on strategic land acquisition, navigating complex government 
+  approval processes, and managing multiple stakeholder relationships including investors, 
+  government officials, and development partners. His approach emphasizes regulatory 
+  compliance, sustainable development practices, and long-term community value creation.

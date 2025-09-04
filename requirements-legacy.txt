@@ -1,0 +1,3 @@
+# Legacy Streamlit interface (optional)
+-r requirements.txt
+streamlit>=1.28.0

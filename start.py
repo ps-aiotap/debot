@@ -23,10 +23,17 @@ def start_services():
     print("Docker services status:")
     print(result.stdout)
     
+    # Get service URLs from environment
+    chroma_port = os.getenv('CHROMA_PORT', '8000')
+    redis_port = os.getenv('REDIS_PORT', '6379')
+    
     print("✅ Services started successfully!")
-    print("🌐 ChromaDB: http://localhost:8008")
-    print("🔴 Redis: localhost:6379")
-    print("\nRun 'streamlit run streamlit_app.py' to start the web interface")
+    print(f"🌐 ChromaDB: http://localhost:{chroma_port}")
+    print(f"🔴 Redis: localhost:{redis_port}")
+    print("\nNext steps:")
+    print("  • Modern UI: python start-dev.py")
+    print("  • Legacy UI: streamlit run streamlit_app.py")
+    print("  • CLI: python main.py")
 
 if __name__ == "__main__":
     start_services()

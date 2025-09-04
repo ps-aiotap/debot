@@ -101,9 +101,8 @@ DeBot isn't just another chatbot - it's a sophisticated AI system designed for o
 2. **Install dependencies**:
 
    ```bash
-   # Backend dependencies
+   # Backend dependencies (includes FastAPI + all core components)
    pip install -r requirements.txt
-   pip install -r requirements-api.txt
    
    # Frontend dependencies
    cd frontend
@@ -150,7 +149,8 @@ DeBot isn't just another chatbot - it's a sophisticated AI system designed for o
    python start-dev.py
    # Opens: http://localhost:5173 (Frontend) + http://localhost:8000 (API)
    
-   # Legacy Streamlit Interface
+   # Legacy Streamlit Interface (optional)
+   pip install -r requirements-legacy.txt
    streamlit run streamlit_app.py
    # Opens: http://localhost:8501
 
@@ -200,6 +200,8 @@ debot/
 ├── start.py              # Docker startup
 ├── docker-compose.yml    # Docker services
 ├── config.yaml           # Configuration
+├── requirements.txt      # Modern interface dependencies
+├── requirements-legacy.txt # Legacy Streamlit interface (optional)
 └── .env                  # Environment variables
 ```
 
@@ -283,9 +285,13 @@ python start-dev.py
 # Health Check: http://localhost:8000/health
 ```
 
-### Legacy Streamlit Interface
+### Legacy Streamlit Interface (Optional)
 
 ```bash
+# Install legacy dependencies first
+pip install -r requirements-legacy.txt
+
+# Then run Streamlit
 streamlit run streamlit_app.py
 # Open http://localhost:8501
 ```
@@ -355,7 +361,8 @@ kubectl port-forward svc/chatbot-service 8502:8502 -n debot
 
 ```bash
 # Install development dependencies
-pip install -r requirements-dev.txt
+pip install -r requirements.txt  # Includes all needed dependencies
+pip install pytest pytest-cov    # Add testing tools
 
 # Run tests
 pytest tests/

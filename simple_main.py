@@ -54,38 +54,56 @@ class SimpleChatbotApp:
         persona_data_dir = self.persona_manager.get_data_dir()
         print(f"Loading data for persona '{self.persona_manager.get_current_persona()}' from {persona_data_dir}")
         
-
-        # Load documents from persona docs directory
-        docs_dir = os.path.join(persona_data_dir, 'docs')
-        if os.path.exists(docs_dir):
-            print(f"Loading documents from {docs_dir}...")
-            docs = load_documents(docs_dir)
-            all_documents.extend(docs)
-            print(f"Loaded {len(docs)} documents from docs directory")
+        # Check if using legacy structure (for default persona)
+        use_legacy = self.persona_manager.get_current_persona() == 'default'
         
-        # Load documents from persona mds directory
-        mds_dir = os.path.join(persona_data_dir, 'mds')
-        if os.path.exists(mds_dir):
-            print(f"Loading markdown documents from {mds_dir}...")
-            mds_docs = load_documents(mds_dir)
-            all_documents.extend(mds_docs)
-            print(f"Loaded {len(mds_docs)} markdown documents")
-        
-        # Load PDFs from persona pdfs directory
-        pdfs_dir = os.path.join(persona_data_dir, 'pdfs')
-        if os.path.exists(pdfs_dir):
-            print(f"Loading PDFs from {pdfs_dir}...")
-            pdfs = load_pdfs(pdfs_dir)
-            all_documents.extend(pdfs)
-            print(f"Loaded {len(pdfs)} PDFs")
-        
-        # Load Excel/CSV test cases from persona directory
-        excel_dir = os.path.join(persona_data_dir, 'excel')
-        if os.path.exists(excel_dir):
-            print(f"Loading Excel/CSV test cases from {excel_dir}...")
-            excel_docs = load_excel_testcases(excel_dir)
-            all_documents.extend(excel_docs)
-            print(f"Loaded {len(excel_docs)} test case documents")
+        if use_legacy:
+            # Legacy structure: load from ./data/docs, ./data/pdfs, ./data/mds
+            legacy_dirs = [
+                (os.path.join(persona_data_dir, 'docs'), load_documents, 'documents'),
+                (os.path.join(persona_data_dir, 'mds'), load_documents, 'markdown documents'),
+                (os.path.join(persona_data_dir, 'pdfs'), load_pdfs, 'PDFs')
+            ]
+            
+            for dir_path, loader_func, desc in legacy_dirs:
+                if os.path.exists(dir_path):
+                    print(f"Loading {desc} from {dir_path}...")
+                    docs = loader_func(dir_path)
+                    all_documents.extend(docs)
+                    print(f"Loaded {len(docs)} {desc}")
+        else:
+            # New persona structure: load from persona-specific subdirectories
+            # Load documents from persona docs directory
+            docs_dir = os.path.join(persona_data_dir, 'docs')
+            if os.path.exists(docs_dir):
+                print(f"Loading documents from {docs_dir}...")
+                docs = load_documents(docs_dir)
+                all_documents.extend(docs)
+                print(f"Loaded {len(docs)} documents from docs directory")
+            
+            # Load documents from persona mds directory
+            mds_dir = os.path.join(persona_data_dir, 'mds')
+            if os.path.exists(mds_dir):
+                print(f"Loading markdown documents from {mds_dir}...")
+                mds_docs = load_documents(mds_dir)
+                all_documents.extend(mds_docs)
+                print(f"Loaded {len(mds_docs)} markdown documents")
+            
+            # Load PDFs from persona pdfs directory
+            pdfs_dir = os.path.join(persona_data_dir, 'pdfs')
+            if os.path.exists(pdfs_dir):
+                print(f"Loading PDFs from {pdfs_dir}...")
+                pdfs = load_pdfs(pdfs_dir)
+                all_documents.extend(pdfs)
+                print(f"Loaded {len(pdfs)} PDFs")
+            
+            # Load Excel/CSV test cases from persona directory
+            excel_dir = os.path.join(persona_data_dir, 'excel')
+            if os.path.exists(excel_dir):
+                print(f"Loading Excel/CSV test cases from {excel_dir}...")
+                excel_docs = load_excel_testcases(excel_dir)
+                all_documents.extend(excel_docs)
+                print(f"Loaded {len(excel_docs)} test case documents")
         
         # Crawl websites
         print("Crawling websites...")

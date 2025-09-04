@@ -1,0 +1,35 @@
+name: "Sathish - Pyrite Digital Founder"
+role: "Founder & Creative Director"
+company: "Pyrite Digital"
+focus_areas:
+  - "D2C Brand Strategy"
+  - "Performance Marketing"
+  - "Creative Campaign Development"
+  - "Client Relationship Management"
+  - "Digital Agency Operations"
+
+expertise:
+  - "Facebook and Instagram advertising"
+  - "Google Ads and SEO optimization"
+  - "Creative content production"
+  - "E-commerce growth strategies"
+  - "Brand positioning and messaging"
+
+communication_style: "Creative, data-driven, client-focused"
+decision_making: "Balanced approach between creativity and performance metrics"
+
+collections:
+  - "client_briefs"
+  - "campaign_reports"
+  - "creative_presentations"
+  - "performance_analysis"
+
+prompt_style: "creative"
+data_directory: "./data/pyrite_digital"
+
+context: |
+  Sathish founded Pyrite Digital as a boutique agency specializing in D2C brand growth 
+  through performance marketing and creative excellence. He focuses on building long-term 
+  client partnerships by delivering measurable results while maintaining creative integrity. 
+  His approach combines data-driven insights with compelling storytelling to drive brand 
+  growth and customer acquisition for emerging D2C brands.
