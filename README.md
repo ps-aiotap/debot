@@ -22,6 +22,8 @@ DeBot isn't just another chatbot - it's a sophisticated AI system designed for o
 - **Source Attribution**: Every answer includes citations with document references
 - **Context-Aware Responses**: Maintains conversation history and context
 - **Intelligent Caching**: Redis-powered caching for lightning-fast responses
+- **Explainability Features**: Understand why specific documents were selected for each query
+- **Location-Aware Filtering**: Detect and flag geographic mismatches in document retrieval
 
 ### 📚 **Comprehensive Data Ingestion**
 - **Universal Format Support**: PDFs, Markdown, Word docs, Excel/CSV, plain text
@@ -31,10 +33,12 @@ DeBot isn't just another chatbot - it's a sophisticated AI system designed for o
 - **Incremental Updates**: Smart re-indexing detects content changes automatically
 
 ### 🔒 **Enterprise-Grade Security**
+- **User Authentication**: Clerk-powered secure authentication and user management
 - **Private Data Processing**: All documents remain within your infrastructure
 - **No Data Leakage**: Persona-based isolation ensures data segregation
 - **API Key Management**: Secure credential handling via environment variables
 - **Network Isolation**: Docker/Kubernetes deployments with network security
+- **Modern Web Security**: CORS, input validation, and secure API endpoints
 
 ## 🔄 Features
 
@@ -56,19 +60,21 @@ DeBot isn't just another chatbot - it's a sophisticated AI system designed for o
 
 ### User Interface
 
-- **Streamlit Web UI**: Interactive chat interface
+- **React Web UI**: Modern, responsive chat interface with Clerk authentication
+- **FastAPI Backend**: RESTful API for chatbot functionality
 - **CLI Interface**: Command-line interaction
-- **Debug Tools**: Environment and connectivity diagnostics
+- **Explainability Features**: Understand document retrieval decisions
 - **Chat History**: Persistent conversation memory
 - **Source Filtering**: Filter by document type or source
 
 ## 🏗️ Architecture
 
-- **Backend**: Python with LlamaIndex for RAG pipeline
+- **Backend**: FastAPI + Python with LlamaIndex for RAG pipeline
+- **Frontend**: React + Vite with Tailwind CSS
+- **Authentication**: Clerk for user management
 - **Vector Database**: ChromaDB for embeddings and similarity search
 - **Caching**: Redis for embeddings, API calls, and responses
 - **Database**: PostgreSQL for document metadata and chat history
-- **Frontend**: Streamlit with interactive chat interface
 - **AI Models**: OpenAI GPT-4/3.5 + text-embedding-3-small
 - **Data Sources**: PDFs, Markdown/Text docs, Web crawling, Excel/CSV
 - **Deployment**: Docker Compose + Kubernetes ready
@@ -78,8 +84,10 @@ DeBot isn't just another chatbot - it's a sophisticated AI system designed for o
 ### Prerequisites
 
 - Python 3.11+
+- Node.js 18+
 - Docker & Docker Compose
 - OpenAI API key or Groq API key
+- Clerk account (for authentication)
 
 ### Installation
 
@@ -93,14 +101,26 @@ DeBot isn't just another chatbot - it's a sophisticated AI system designed for o
 2. **Install dependencies**:
 
    ```bash
+   # Backend dependencies
    pip install -r requirements.txt
+   pip install -r requirements-api.txt
+   
+   # Frontend dependencies
+   cd frontend
+   npm install
+   cd ..
    ```
 
 3. **Configure environment**:
 
    ```bash
+   # Backend configuration
    cp .env.example .env
    # Update .env with your API keys
+   
+   # Frontend configuration
+   cp frontend/.env.example frontend/.env
+   # Add your Clerk publishable key
    ```
 
 4. **Start Docker services**:
@@ -126,8 +146,13 @@ DeBot isn't just another chatbot - it's a sophisticated AI system designed for o
 7. **Run the application**:
 
    ```bash
-   # Web Interface
+   # Modern Web Interface (React + FastAPI)
+   python start-dev.py
+   # Opens: http://localhost:5173 (Frontend) + http://localhost:8000 (API)
+   
+   # Legacy Streamlit Interface
    streamlit run streamlit_app.py
+   # Opens: http://localhost:8501
 
    # CLI Interface
    python main.py
@@ -142,11 +167,20 @@ DeBot isn't just another chatbot - it's a sophisticated AI system designed for o
 
 ```
 debot/
-├── ingest/                 # Data ingestion modules
-│   ├── load_docs.py       # Markdown/text loader
-│   ├── load_pdfs.py       # PDF parser with caching
-│   ├── crawler.py         # Async web crawler
-│   ├── load_excel.py      # Excel/CSV test cases
+├── api/                   # FastAPI backend
+│   └── main.py           # REST API endpoints
+├── frontend/              # React frontend
+│   ├── src/
+│   │   ├── components/   # React components
+│   │   ├── App.jsx       # Main app with Clerk auth
+│   │   └── main.jsx      # Entry point
+│   ├── package.json      # Node.js dependencies
+│   └── .env              # Frontend environment
+├── ingest/                # Data ingestion modules
+│   ├── load_docs.py      # Markdown/text loader
+│   ├── load_pdfs.py      # PDF parser with caching
+│   ├── crawler.py        # Async web crawler
+│   ├── load_excel.py     # Excel/CSV test cases
 │   └── load_sharepoint.py # SharePoint integration
 ├── providers/             # LLM providers
 ├── data/                  # Data directories
@@ -154,12 +188,14 @@ debot/
 │   ├── pdfs/             # PDF files
 │   └── mds/              # Markdown files
 ├── k8s/                   # Kubernetes manifests
+├── explainability.py      # Document retrieval explanations
 ├── cache_utils.py         # Redis caching utilities
 ├── embedding_service.py   # Embedding & indexing
-├── qa_service.py         # RAG query engine
+├── qa_service.py         # RAG query engine with explainability
 ├── database.py           # PostgreSQL models
 ├── main.py               # CLI application
-├── streamlit_app.py      # Web UI
+├── streamlit_app.py      # Legacy Streamlit UI
+├── start-dev.py          # Development startup script
 ├── setup.py              # Setup script
 ├── start.py              # Docker startup
 ├── docker-compose.yml    # Docker services
@@ -235,7 +271,19 @@ retrieval:
 
 ## 🔧 Usage
 
-### Web Interface
+### Modern Web Interface (Recommended)
+
+```bash
+# Start both backend and frontend
+python start-dev.py
+
+# Access the application:
+# Frontend: http://localhost:5173
+# API Docs: http://localhost:8000/docs
+# Health Check: http://localhost:8000/health
+```
+
+### Legacy Streamlit Interface
 
 ```bash
 streamlit run streamlit_app.py
@@ -332,9 +380,10 @@ mypy debot/
 
 ### Health Checks
 
+- FastAPI Backend: `http://localhost:8000/health`
 - ChromaDB: `http://localhost:8000/api/v1/heartbeat`
 - Redis: `redis-cli ping`
-- Application: Built-in health endpoints
+- Frontend: `http://localhost:5173`
 
 ### Logging
 
@@ -344,14 +393,20 @@ mypy debot/
 
 ## 🔒 Security
 
-- API key management via environment variables
-- No credentials stored in code or containers
-- Network isolation in Docker/Kubernetes deployments
-- Input validation and sanitization
+- **User Authentication**: Clerk integration with secure sign-in/sign-out
+- **API Security**: CORS configuration and request validation
+- **API Key Management**: Environment variables for secure credential handling
+- **No Data Leakage**: Persona-based isolation ensures data segregation
+- **Network Isolation**: Docker/Kubernetes deployments with network security
+- **Input Validation**: Sanitization and validation of user inputs
 
 ## 🚀 Performance
 
+- **Modern Frontend**: React with Vite for fast development and optimized builds
+- **Async Backend**: FastAPI with async/await for high performance
 - **Caching Strategy**: Multi-layer caching (Redis + in-memory)
+- **Explainability**: Optional document retrieval explanations for debugging
+- **Real-time Updates**: WebSocket-ready architecture for future enhancements
 - **Async Processing**: Non-blocking I/O for web crawling
 - **Batch Operations**: Efficient document processing
 - **Resource Optimization**: Configurable chunk sizes and retrieval limits
