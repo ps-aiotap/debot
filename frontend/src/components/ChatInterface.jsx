@@ -1,7 +1,9 @@
 import { useState, useRef, useEffect } from 'react'
+import { useAuth } from '@clerk/clerk-react'
 import axios from 'axios'
 
 const ChatInterface = () => {
+  const { getToken } = useAuth()
   const [messages, setMessages] = useState([])
   const [input, setInput] = useState('')
   const [loading, setLoading] = useState(false)
@@ -25,8 +27,13 @@ const ChatInterface = () => {
     setLoading(true)
 
     try {
+      const token = await getToken()
       const response = await axios.post(`${apiUrl}/chat`, {
         message: input
+      }, {
+        headers: {
+          Authorization: `Bearer ${token}`
+        }
       })
 
       const botMessage = {
@@ -56,10 +63,9 @@ const ChatInterface = () => {
 
   return (
     <div className="flex flex-col h-screen bg-gray-50">
-      {/* Header */}
-      <div className="bg-white shadow-sm border-b p-4">
-        <h1 className="text-2xl font-bold text-gray-800">🤖 DeBot - AI Domain Expert</h1>
-        <p className="text-gray-600">Ask questions about your documents and business requirements</p>
+      {/* Chat Header */}
+      <div className="bg-gray-100 p-3">
+        <p className="text-gray-600 text-sm">Ask questions about your documents and business requirements</p>
       </div>
 
       {/* Messages */}

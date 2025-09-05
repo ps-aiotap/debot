@@ -1,4 +1,4 @@
-from fastapi import FastAPI, HTTPException
+from fastapi import FastAPI, HTTPException, Depends
 from fastapi.middleware.cors import CORSMiddleware
 from pydantic import BaseModel
 from typing import Optional, List, Dict, Any
@@ -6,9 +6,15 @@ import asyncio
 import os
 from dotenv import load_dotenv
 import sys
-sys.path.append('..')
+import os
+sys.path.append(os.path.dirname(os.path.dirname(os.path.abspath(__file__))))
 from simple_main import SimpleChatbotApp
 from persona_manager import PersonaManager
+from auth.dependencies import get_current_user, get_optional_user
+from auth.models import User
+from database import get_db
+from datetime import datetime
+from sqlalchemy.orm import Session
 
 load_dotenv(override=True)
 
@@ -36,7 +42,9 @@ def health_check():
     return {"status": "healthy"}
 
 chatbot_app = None
-persona_config_path = os.path.join("..", "persona_config.json")
+# Get project root directory
+project_root = os.path.dirname(os.path.dirname(os.path.abspath(__file__)))
+persona_config_path = os.path.join(project_root, "persona_config.json")
 persona_manager = PersonaManager(config_path=persona_config_path)
 
 class ChatRequest(BaseModel):
@@ -49,11 +57,18 @@ class ChatResponse(BaseModel):
     sources: List[Dict[str, Any]]
     explanation: Optional[Dict[str, Any]] = None
 
+class UserResponse(BaseModel):
+    id: int
+    clerk_user_id: str
+    email: str
+    display_name: Optional[str]
+    created_at: str
+
 @app.on_event("startup")
 async def startup_event():
     global chatbot_app
     try:
-        config_path = os.path.join("..", "config.yaml")
+        config_path = os.path.join(project_root, "config.yaml")
         chatbot_app = SimpleChatbotApp(config_path=config_path, persona_manager=persona_manager)
         await chatbot_app.initialize()
         print("✅ Chatbot initialized successfully")
@@ -64,7 +79,10 @@ async def startup_event():
 
 
 @app.get("/personas")
-async def get_personas():
+async def get_personas(
+    current_user = Depends(get_current_user)
+):
+    """Get available personas for authenticated user"""
     return {
         "available": persona_manager.get_available_personas(),
         "current": persona_manager.get_current_persona(),
@@ -72,8 +90,44 @@ async def get_personas():
         "prompt_style": persona_manager.get_prompt_style()
     }
 
+@app.get("/auth/me", response_model=UserResponse)
+async def get_current_user_info(
+    current_user = Depends(get_current_user),
+    db: Session = Depends(get_db)
+):
+    """Get current authenticated user info"""
+    if db:
+        from auth.user_service import UserService
+        user_service = UserService(db)
+        db_user = user_service.get_or_create_user(
+            clerk_user_id=current_user.clerk_user_id,
+            email=current_user.email,
+            display_name=current_user.display_name
+        )
+        return UserResponse(
+            id=db_user.id,
+            clerk_user_id=db_user.clerk_user_id,
+            email=db_user.email,
+            display_name=db_user.display_name,
+            created_at=db_user.created_at.isoformat()
+        )
+    else:
+        # Fallback when DB not available
+        return UserResponse(
+            id=0,
+            clerk_user_id=current_user.clerk_user_id,
+            email=current_user.email,
+            display_name=current_user.display_name,
+            created_at=datetime.now().isoformat()
+        )
+
 @app.post("/chat", response_model=ChatResponse)
-async def chat(request: ChatRequest):
+async def chat(
+    request: ChatRequest,
+    current_user = Depends(get_current_user),
+    db: Session = Depends(get_db)
+):
+    """Protected chat endpoint requiring authentication"""
     if not chatbot_app:
         raise HTTPException(status_code=500, detail="Chatbot not initialized")
     
@@ -95,3 +149,7 @@ async def chat(request: ChatRequest):
         )
     except Exception as e:
         raise HTTPException(status_code=500, detail=str(e))
+
+if __name__ == "__main__":
+    import uvicorn
+    uvicorn.run(app, host="0.0.0.0", port=8000, reload=True)

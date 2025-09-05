@@ -82,8 +82,9 @@ DeBot isn't just another chatbot - it's a sophisticated AI system designed for o
 - Python 3.11+
 - Node.js 18+
 - Docker & Docker Compose
+- PostgreSQL (for user management)
 - OpenAI API key or Groq API key
-- Clerk account (for authentication)
+- **Clerk account** (for authentication) - Sign up at https://clerk.com
 
 ### Installation
 
@@ -106,21 +107,30 @@ DeBot isn't just another chatbot - it's a sophisticated AI system designed for o
    cd ..
    ```
 
-3. **Configure environment**:
+3. **Configure authentication & environment**:
 
    ```bash
    # Backend configuration
    cp .env.example .env
-   # Update .env with your API keys
+   # Update .env with:
+   # - CLERK_SECRET_KEY (from Clerk dashboard)
+   # - OPENAI_API_KEY or GROQ_API_KEY
+   # - PostgreSQL credentials
    
    # Frontend configuration
    cp frontend/.env.example frontend/.env
-   # Add your Clerk publishable key
+   # Add VITE_CLERK_PUBLISHABLE_KEY (from Clerk dashboard)
    ```
 
-4. **Start Docker services**:
+   **📋 See [AUTH_SETUP.md](AUTH_SETUP.md) for detailed authentication configuration.**
+
+4. **Start services**:
 
    ```bash
+   # Start PostgreSQL (required for authentication)
+   docker run --name postgres -e POSTGRES_PASSWORD=debot_password -p 5432:5432 -d postgres
+   
+   # Start other Docker services
    python start.py
    # Or manually: docker-compose up -d
    ```
@@ -141,9 +151,13 @@ DeBot isn't just another chatbot - it's a sophisticated AI system designed for o
 7. **Run the application**:
 
    ```bash
-   # Modern Web Interface (React + FastAPI)
+   # Modern Web Interface (React + FastAPI) - Requires Authentication
    python start-dev.py
+   # OR run manually:
+   # Backend: uvicorn api.main:app --reload --port 8000
+   # Frontend: cd frontend && npm run dev
    # Opens: http://localhost:5173 (Frontend) + http://localhost:8000 (API)
+   # Note: You'll be redirected to Clerk sign-in on first visit
    
    # Legacy Streamlit Interface (optional)
    pip install -r requirements-legacy.txt

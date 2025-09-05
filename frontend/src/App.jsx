@@ -1,7 +1,12 @@
-import ChatInterface from './components/ChatInterface'
+import AuthWrapper from './components/AuthWrapper'
+import Dashboard from './components/Dashboard'
 
 function App() {
-  return <ChatInterface />
+  return (
+    <AuthWrapper>
+      <Dashboard />
+    </AuthWrapper>
+  )
 }
 
 export default App

@@ -6,6 +6,7 @@ from sqlalchemy.ext.declarative import declarative_base
 from sqlalchemy.orm import sessionmaker
 from datetime import datetime
 from dotenv import load_dotenv
+from auth.models import User
 
 load_dotenv()
 
@@ -69,6 +70,9 @@ else:
         answer = Column(Text)
         sources = Column(Text)  # JSON string
         created_at = Column(DateTime, default=datetime.utcnow)
+
+    # Import User model to ensure it's registered
+    User.__table__.metadata = Base.metadata
 
 
 def create_tables():
