@@ -55,6 +55,7 @@ else:
         __tablename__ = "documents"
 
         id = Column(Integer, primary_key=True, index=True)
+        org_id = Column(Integer, nullable=False, index=True)  # Tenant isolation
         content_hash = Column(String, unique=True, index=True)
         filename = Column(String, index=True)
         source = Column(String)
@@ -66,6 +67,8 @@ else:
         __tablename__ = "chat_history"
 
         id = Column(Integer, primary_key=True, index=True)
+        org_id = Column(Integer, nullable=False, index=True)  # Tenant isolation
+        user_id = Column(Integer, nullable=False, index=True)
         question = Column(Text)
         answer = Column(Text)
         sources = Column(Text)  # JSON string

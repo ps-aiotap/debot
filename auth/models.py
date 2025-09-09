@@ -1,5 +1,6 @@
 from sqlalchemy import Column, String, DateTime, Integer
 from sqlalchemy.ext.declarative import declarative_base
+from sqlalchemy.orm import relationship
 from datetime import datetime
 from typing import Optional
 
@@ -14,6 +15,9 @@ class User(Base):
     email = Column(String, index=True, nullable=False)
     display_name = Column(String, nullable=True)
     created_at = Column(DateTime, default=datetime.utcnow)
+    
+    # Relationships
+    memberships = relationship("UserOrgMembership", back_populates="user")
 
     def __repr__(self) -> str:
         return f"<User(id={self.id}, email={self.email})>"
